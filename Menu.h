@@ -14,7 +14,7 @@ typedef enum MY_ENUM
 typedef struct MY_BUTTON
 {
 	char* name;
-	int index;
+	int connect_with_window;
 	POINT cords[2];
 	COLORREF color;
 	COLORREF hight_color;
@@ -23,7 +23,7 @@ typedef struct MY_BUTTON
 typedef struct MY_WINDOW
 {
 	int num_of_buttons;
-	int index;
+	int connect_with_button;
 	POINT cords[2];
 	COLORREF color;
 	my_button* buttons;

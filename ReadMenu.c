@@ -65,7 +65,7 @@ void* ReadTXT()
 			menuTXT->windows[WinNum].cords[0] = (POINT){ GetDigit(stream), GetDigit(stream) };
 			menuTXT->windows[WinNum].cords[1] = (POINT){ GetDigit(stream), GetDigit(stream) };
 			menuTXT->windows[WinNum].color = RGB(GetDigit(stream), GetDigit(stream), GetDigit(stream));
-			menuTXT->windows[WinNum].index = GetDigit(stream);
+			menuTXT->windows[WinNum].connect_with_button = GetDigit(stream);
 		}
 		if (strcmp(word, "Button") == 0)
 		{
@@ -81,7 +81,7 @@ void* ReadTXT()
 			menuTXT->windows[WinNum].buttons[menuTXT->windows[WinNum].num_of_buttons - 1].cords[1] = (POINT){ GetDigit(stream), GetDigit(stream) };
 			menuTXT->windows[WinNum].buttons[menuTXT->windows[WinNum].num_of_buttons - 1].color = RGB(GetDigit(stream), GetDigit(stream), GetDigit(stream));
 			menuTXT->windows[WinNum].buttons[menuTXT->windows[WinNum].num_of_buttons - 1].hight_color = RGB(GetDigit(stream), GetDigit(stream), GetDigit(stream));
-			menuTXT->windows[WinNum].buttons[menuTXT->windows[WinNum].num_of_buttons - 1].index = GetDigit(stream);
+			menuTXT->windows[WinNum].buttons[menuTXT->windows[WinNum].num_of_buttons - 1].connect_with_window = GetDigit(stream);
 		}
 	}
 	return menuTXT;
@@ -98,9 +98,9 @@ void Click_Handler(my_menu* menu ,my_enum key)
 			menu->selected_button--;
 			for (int i = 0; i < menu->num_of_windows; i++)
 			{
-				if (menu->windows[i].index == menu->windows[menu->selected_window].buttons[menu->selected_button].index)
+				if (menu->windows[i].connect_with_button == menu->windows[menu->selected_window].buttons[menu->selected_button].connect_with_window)
 					menu->windows[i].active = true;
-				if (menu->windows[i].index == menu->windows[menu->selected_window].buttons[menu->selected_button + 1].index)
+				if (menu->windows[i].connect_with_button == menu->windows[menu->selected_window].buttons[menu->selected_button + 1].connect_with_window)
 					menu->windows[i].active = false;
 			}
 		}
@@ -113,9 +113,9 @@ void Click_Handler(my_menu* menu ,my_enum key)
 			menu->selected_button++;
 			for (int i = 0; i < menu->num_of_windows; i++)
 			{
-				if (menu->windows[i].index == menu->windows[menu->selected_window].buttons[menu->selected_button].index)
+				if (menu->windows[i].connect_with_button == menu->windows[menu->selected_window].buttons[menu->selected_button].connect_with_window)
 					menu->windows[i].active = true;
-				if (menu->windows[i].index == menu->windows[menu->selected_window].buttons[menu->selected_button - 1].index)
+				if (menu->windows[i].connect_with_button == menu->windows[menu->selected_window].buttons[menu->selected_button - 1].connect_with_window)
 					menu->windows[i].active = false;
 			}
 		}
@@ -123,7 +123,7 @@ void Click_Handler(my_menu* menu ,my_enum key)
 	}
 	case right:
 	{
-		if ((menu->windows[menu->selected_window].buttons[menu->selected_button].index != 0) && (menu->selected_window < menu->num_of_windows - 1))
+		if ((menu->windows[menu->selected_window].buttons[menu->selected_button].connect_with_window != 0) && (menu->selected_window < menu->num_of_windows - 1))
 		{
 			menu->selected_window++;
 			menu->selected_button = 0;
@@ -135,7 +135,7 @@ void Click_Handler(my_menu* menu ,my_enum key)
 		if (menu->selected_window > 0)
 		{
 			for (int i = 0; i < menu->windows[menu->selected_window - 1].num_of_buttons; i++)
-				if (menu->windows[menu->selected_window].index == menu->windows[menu->selected_window - 1].buttons[i].index)
+				if (menu->windows[menu->selected_window].connect_with_button == menu->windows[menu->selected_window - 1].buttons[i].connect_with_window)
 					menu->selected_button = i;
 			menu->selected_window--;
 			if (menu->selected_window < menu->num_of_windows - 1)
@@ -154,7 +154,7 @@ void Paint(HDC hdc, my_menu* menu, my_enum key)
 
 	for (int i = 0; i < menu->num_of_windows; i++)
 	{
-		if ((menu->windows[i].active == true) || (menu->windows[i].index == 0))
+		if ((menu->windows[i].active == true) || (menu->windows[i].connect_with_button == 0))
 		{
 			HBRUSH brush_for_window = CreateSolidBrush(menu->windows[i].color);
 			SelectObject(hdc, brush_for_window);
