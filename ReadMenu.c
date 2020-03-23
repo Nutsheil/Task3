@@ -1,39 +1,16 @@
 #include "Menu.h"
 
-typedef struct MY_BUTTON
-{
-	char* name;
-	int index;
-	POINT cords[2];
-	COLORREF color;
-	COLORREF hight_color;
-}my_button;
-
-typedef struct MY_WINDOW
-{
-	int num_of_buttons;
-	int index;
-	POINT cords[2];
-	COLORREF color;
-	my_button* buttons;
-	bool active;
-}my_window;
-
-typedef struct MY_MENU
-{
-	my_window* windows;
-	int num_of_windows;
-}my_menu;
-
 char* GetWord(FILE* stream)
 {
+	int i = 0, lenght_of_word = 10;
 	char c;
-	char* word = malloc(20);
-	int i = 0;
+	char* word = malloc(lenght_of_word);
 	while (!isalnum(c = fgetc(stream)));
 	do
 	{
 		word[i++] = c;
+		if (i == lenght_of_word)
+			word = realloc(word, lenght_of_word += 10);
 	} while (isalnum(c = fgetc(stream)));
 	word[i] = '\0';
 
@@ -42,13 +19,15 @@ char* GetWord(FILE* stream)
 
 int GetDigit(FILE* stream)
 {
+	int i = 0, lenght_of_digits = 10;
 	char c;
 	char* digits = malloc(10);
-	int i = 0;
 	while (!isdigit(c = fgetc(stream)));
 	do
 	{
 		digits[i++] = c;
+		if (i == lenght_of_digits)
+			digits = realloc(digits, lenght_of_digits += 10);
 	} while (isdigit(c = fgetc(stream)));
 	digits[i] = '\0';
 
@@ -60,6 +39,9 @@ void* ReadTXT()
 	my_menu* menuTXT = (my_menu*)malloc(sizeof(my_menu));
 	menuTXT->windows = (my_window*)malloc(sizeof(my_window));
 	menuTXT->num_of_windows = 0;
+	menuTXT->selected_button = -1;
+	menuTXT->selected_window = 0;
+	int WinNum = -1;
 
 	FILE* stream = fopen("menu.txt", "rb");
 	if (stream == NULL)
@@ -72,51 +54,53 @@ void* ReadTXT()
 		if (strcmp(word, "Window") == 0)
 		{
 			menuTXT->num_of_windows++;
+			WinNum++;
+
 			if (menuTXT->num_of_windows > 1)
 				menuTXT->windows = realloc(menuTXT->windows, menuTXT->num_of_windows * sizeof(my_window));
 
-			menuTXT->windows[menuTXT->num_of_windows - 1].buttons = (my_button*)malloc(sizeof(my_button));
-			menuTXT->windows[menuTXT->num_of_windows - 1].num_of_buttons = 0;
+			menuTXT->windows[WinNum].buttons = (my_button*)malloc(sizeof(my_button));
+			menuTXT->windows[WinNum].num_of_buttons = 0;
 
-			menuTXT->windows[menuTXT->num_of_windows - 1].cords[0] = (POINT){ GetDigit(stream), GetDigit(stream) };
-			menuTXT->windows[menuTXT->num_of_windows - 1].cords[1] = (POINT){ GetDigit(stream), GetDigit(stream) };
-			menuTXT->windows[menuTXT->num_of_windows - 1].color = RGB(GetDigit(stream), GetDigit(stream), GetDigit(stream));
-			menuTXT->windows[menuTXT->num_of_windows - 1].index = GetDigit(stream);
+			menuTXT->windows[WinNum].cords[0] = (POINT){ GetDigit(stream), GetDigit(stream) };
+			menuTXT->windows[WinNum].cords[1] = (POINT){ GetDigit(stream), GetDigit(stream) };
+			menuTXT->windows[WinNum].color = RGB(GetDigit(stream), GetDigit(stream), GetDigit(stream));
+			menuTXT->windows[WinNum].index = GetDigit(stream);
 		}
 		if (strcmp(word, "Button") == 0)
 		{
-			menuTXT->windows[menuTXT->num_of_windows - 1].num_of_buttons++;
-			if (menuTXT->windows[menuTXT->num_of_windows - 1].num_of_buttons > 1)
-				menuTXT->windows[menuTXT->num_of_windows - 1].buttons = realloc(menuTXT->windows[menuTXT->num_of_windows - 1].buttons, menuTXT->windows[menuTXT->num_of_windows - 1].num_of_buttons * sizeof(my_button));
+			if (WinNum == -1)
+				exit(1);
 
-			menuTXT->windows[menuTXT->num_of_windows - 1].buttons[menuTXT->windows[menuTXT->num_of_windows - 1].num_of_buttons - 1].name = GetWord(stream);
-			menuTXT->windows[menuTXT->num_of_windows - 1].buttons[menuTXT->windows[menuTXT->num_of_windows - 1].num_of_buttons - 1].cords[0] = (POINT){ GetDigit(stream), GetDigit(stream) };
-			menuTXT->windows[menuTXT->num_of_windows - 1].buttons[menuTXT->windows[menuTXT->num_of_windows - 1].num_of_buttons - 1].cords[1] = (POINT){ GetDigit(stream), GetDigit(stream) };
-			menuTXT->windows[menuTXT->num_of_windows - 1].buttons[menuTXT->windows[menuTXT->num_of_windows - 1].num_of_buttons - 1].color = RGB(GetDigit(stream), GetDigit(stream), GetDigit(stream));
-			menuTXT->windows[menuTXT->num_of_windows - 1].buttons[menuTXT->windows[menuTXT->num_of_windows - 1].num_of_buttons - 1].hight_color = RGB(GetDigit(stream), GetDigit(stream), GetDigit(stream));
-			menuTXT->windows[menuTXT->num_of_windows - 1].buttons[menuTXT->windows[menuTXT->num_of_windows - 1].num_of_buttons - 1].index = GetDigit(stream);
+			menuTXT->windows[WinNum].num_of_buttons++;
+			if (menuTXT->windows[WinNum].num_of_buttons > 1)
+				menuTXT->windows[WinNum].buttons = realloc(menuTXT->windows[WinNum].buttons, menuTXT->windows[WinNum].num_of_buttons * sizeof(my_button));
+
+			menuTXT->windows[WinNum].buttons[menuTXT->windows[WinNum].num_of_buttons - 1].name = GetWord(stream);
+			menuTXT->windows[WinNum].buttons[menuTXT->windows[WinNum].num_of_buttons - 1].cords[0] = (POINT){ GetDigit(stream), GetDigit(stream) };
+			menuTXT->windows[WinNum].buttons[menuTXT->windows[WinNum].num_of_buttons - 1].cords[1] = (POINT){ GetDigit(stream), GetDigit(stream) };
+			menuTXT->windows[WinNum].buttons[menuTXT->windows[WinNum].num_of_buttons - 1].color = RGB(GetDigit(stream), GetDigit(stream), GetDigit(stream));
+			menuTXT->windows[WinNum].buttons[menuTXT->windows[WinNum].num_of_buttons - 1].hight_color = RGB(GetDigit(stream), GetDigit(stream), GetDigit(stream));
+			menuTXT->windows[WinNum].buttons[menuTXT->windows[WinNum].num_of_buttons - 1].index = GetDigit(stream);
 		}
 	}
 	return menuTXT;
 }
 
-void Paint(HDC hdc, void* menuu, my_enum key)
+void Click_Handler(my_menu* menu ,my_enum key)
 {
-	my_menu* menu = (my_menu*)menuu;
-	static int selected_button = -1, selected_window = 0;
-
 	switch (key)
 	{
 	case up:
 	{
-		if (selected_button > 0)
+		if (menu->selected_button > 0)
 		{
-			selected_button--;
+			menu->selected_button--;
 			for (int i = 0; i < menu->num_of_windows; i++)
 			{
-				if (menu->windows[i].index == menu->windows[selected_window].buttons[selected_button].index)
+				if (menu->windows[i].index == menu->windows[menu->selected_window].buttons[menu->selected_button].index)
 					menu->windows[i].active = true;
-				if (menu->windows[i].index == menu->windows[selected_window].buttons[selected_button + 1].index)
+				if (menu->windows[i].index == menu->windows[menu->selected_window].buttons[menu->selected_button + 1].index)
 					menu->windows[i].active = false;
 			}
 		}
@@ -124,14 +108,14 @@ void Paint(HDC hdc, void* menuu, my_enum key)
 	}
 	case down:
 	{
-		if (selected_button < menu->windows[selected_window].num_of_buttons - 1)
+		if (menu->selected_button < menu->windows[menu->selected_window].num_of_buttons - 1)
 		{
-			selected_button++;
+			menu->selected_button++;
 			for (int i = 0; i < menu->num_of_windows; i++)
 			{
-				if (menu->windows[i].index == menu->windows[selected_window].buttons[selected_button].index)
+				if (menu->windows[i].index == menu->windows[menu->selected_window].buttons[menu->selected_button].index)
 					menu->windows[i].active = true;
-				if (menu->windows[i].index == menu->windows[selected_window].buttons[selected_button - 1].index)
+				if (menu->windows[i].index == menu->windows[menu->selected_window].buttons[menu->selected_button - 1].index)
 					menu->windows[i].active = false;
 			}
 		}
@@ -139,29 +123,34 @@ void Paint(HDC hdc, void* menuu, my_enum key)
 	}
 	case right:
 	{
-		if ((menu->windows[selected_window].buttons[selected_button].index != 0) && (selected_window < menu->num_of_windows - 1))
+		if ((menu->windows[menu->selected_window].buttons[menu->selected_button].index != 0) && (menu->selected_window < menu->num_of_windows - 1))
 		{
-			selected_window++;
-			selected_button = 0;
+			menu->selected_window++;
+			menu->selected_button = 0;
 		}
 		break;
 	}
 	case left:
 	{
-		if (selected_window > 0)
+		if (menu->selected_window > 0)
 		{
-			for (int i = 0; i < menu->windows[selected_window - 1].num_of_buttons; i++)
-				if (menu->windows[selected_window].index == menu->windows[selected_window - 1].buttons[i].index)
-					selected_button = i;
-			selected_window--;
-			if (selected_window < menu->num_of_windows - 1)
-				menu->windows[selected_window + 2].active = false;
+			for (int i = 0; i < menu->windows[menu->selected_window - 1].num_of_buttons; i++)
+				if (menu->windows[menu->selected_window].index == menu->windows[menu->selected_window - 1].buttons[i].index)
+					menu->selected_button = i;
+			menu->selected_window--;
+			if (menu->selected_window < menu->num_of_windows - 1)
+				menu->windows[menu->selected_window + 2].active = false;
 		}
 		break;
 	}
 	default:
 		break;
 	}
+}
+
+void Paint(HDC hdc, my_menu* menu, my_enum key)
+{
+	Click_Handler(menu, key);
 
 	for (int i = 0; i < menu->num_of_windows; i++)
 	{
@@ -175,7 +164,7 @@ void Paint(HDC hdc, void* menuu, my_enum key)
 			for (int j = 0; j < menu->windows[i].num_of_buttons; j++)
 			{
 				HBRUSH brush_for_button;
-				if ((j == selected_button) && (i == selected_window))
+				if ((j == menu->selected_button) && (i == menu->selected_window))
 				{
 					brush_for_button = CreateSolidBrush(menu->windows[i].buttons[j].hight_color);
 					SetBkColor(hdc, menu->windows[i].buttons[j].hight_color);
