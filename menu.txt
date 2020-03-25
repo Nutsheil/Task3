@@ -1,0 +1,27 @@
+MenuBegin
+	Window(100, 100, 200, 160, 255, 255, 255, 0)
+	Button(button1, 100, 100, 200, 120, 255, 255, 255, 0, 255, 0, 0)
+	Button(button2, 100, 120, 200, 140, 255, 255, 255, 0, 255, 0, 1)
+	Button(button3, 100, 140, 200, 160, 255, 255, 255, 0, 255, 0, 0)
+
+	Window(200, 120, 300, 180, 255, 255, 255, 1)
+	Button(button11, 200, 120, 300, 140, 255, 255, 255, 0, 255, 0, 0)
+	Button(button12, 200, 140, 300, 160, 255, 255, 255, 0, 255, 0, 2)
+	Button(button13, 200, 160, 300, 180, 255, 255, 255, 0, 255, 0, 0)
+	
+	Window(300, 100, 400, 160, 255, 255, 255, 2)
+	Button(button21, 300, 100, 400, 120, 255, 255, 255, 0, 255, 0, 0)
+	Button(button22, 300, 120, 400, 140, 255, 255, 255, 0, 255, 0, 0)
+	Button(button23, 300, 140, 400, 160, 255, 255, 255, 0, 255, 0, 0)
+MenuEnd
+
+
+MenuBegin
+	Window(point, point, RGB, index)
+	Button(name, point, point, RGB, RGB, index)	
+	Button(name, point, point, RGB, RGB, index)
+
+	Window(point, point, RGB, index)
+	Button(name, point, point, RGB, RGB, index)	
+	Button(name, point, point, RGB, RGB, index)
+MenuEnd
