@@ -10,7 +10,7 @@ ATOM registerMyClass(HINSTANCE hInstance);
 int createMyWindow(HINSTANCE hInstance, int nCmdShow);
 //////////////////////////////////////
 
-void* menu = NULL;
+my_menu* menu = NULL;
 
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpszCmdParam, _In_ int nCmdShow)
 {

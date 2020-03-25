@@ -34,7 +34,7 @@ int GetDigit(FILE* stream)
 	return atoi(digits);
 }
 
-void* ReadTXT()
+my_menu* ReadTXT()
 {
 	my_menu* menuTXT = (my_menu*)malloc(sizeof(my_menu));
 	menuTXT->windows = (my_window*)malloc(sizeof(my_window));

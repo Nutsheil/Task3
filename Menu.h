@@ -36,6 +36,6 @@ typedef struct MY_MENU
 	int num_of_windows, selected_button, selected_window;
 }my_menu;
 
-void* ReadTXT();
+my_menu* ReadTXT();
 
 void Paint(HDC hdc, my_menu* menu, my_enum key);
